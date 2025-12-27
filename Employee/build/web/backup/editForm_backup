@@ -1,0 +1,76 @@
+
+<%@taglib prefix="sql" uri="http://java.sun.com/jsp/jstl/sql"%>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+
+<sql:setDataSource var="myDatasource" driver="org.apache.derby.jdbc.ClientDriver" url="jdbc:derby://localhost:1527/Java DB" user="app" password="app"/>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Employee</title>
+    <style>
+        .form-box {
+            width: 350px;
+            padding: 10px;
+        }
+        .form-box form {
+            display: grid;
+            width: 300px;
+            grid-template-columns: 120px 150px;
+            row-gap: 8px;
+            column-gap: 5px;
+        }
+        .form-box input {
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+
+<%-- ================== UPDATE PROCESS ================== --%>
+<c:if test="${pageContext.request.method == 'POST'}">
+    <sql:update dataSource="${myDatasource}">
+        UPDATE STAFF
+        SET NAME = ?, SALARY = ?, DESIGNATION = ?
+        WHERE ID = ?
+        <sql:param value="${param.NAME}"/>
+        <sql:param value="${param.SALARY}"/>
+        <sql:param value="${param.DESIGNATION}"/>
+        <sql:param value="${param.ID}"/>
+    </sql:update>
+
+    <p>Data updated successfully!</p>
+</c:if>
+
+<%-- ================== RETRIEVE DATA ================== --%>
+<sql:query var="emp" dataSource="${myDatasource}">
+    SELECT * FROM STAFF WHERE ID = ?
+    <sql:param value="${param.ID}"/>
+</sql:query>
+
+<h2>Edit Employee</h2>
+
+<div class="form-box">
+<form action="editForm.jsp" method="POST">
+
+    <%-- Hidden ID --%>
+    <input type="hidden" name="ID" value="${param.ID}">
+
+    <label>Name:</label>
+    <input type="text" name="NAME" value="${emp.rows[0].NAME}" required>
+
+    <label>Salary:</label>
+    <input type="number" name="SALARY" value="${emp.rows[0].SALARY}" required>
+
+    <label>Designation:</label>
+    <input type="text" name="DESIGNATION" value="${emp.rows[0].DESIGNATION}" required>
+
+    <input type="submit" value="Edit Save">
+
+</form>
+</div>
+
+</body>
+</html>
